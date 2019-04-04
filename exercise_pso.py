@@ -41,5 +41,5 @@ for fn, inertia_strategy in cases:
                       communication=communication_strategy)
 
             best, best_fitness, fitness_evolution = pso.optimize(fn)
-            print('{} - Comm {}, Inertia {}, Fun {}: {}'.format(
+            print('{} - {}, {}, {}: {}'.format(
                 i, communication_strategy.__class__.__name__, inertia_strategy.__class__.__name__, fn.name, best_fitness))

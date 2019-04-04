@@ -1,6 +1,10 @@
 import math
 
 
+def find_best(swarm):
+    return min(swarm, key=lambda p: p.fitness)
+
+
 class Inertia(object):
     @staticmethod
     def constant(weight=0.8):
@@ -44,7 +48,7 @@ class Communication(object):
                 pass
 
             def __call__(self, particle, swarm):
-                return min(swarm, key=lambda p: p.fitness)
+                return find_best(swarm)
 
         return GlobalCommunication()
 
@@ -71,7 +75,7 @@ class Communication(object):
 
             def __call__(self, particle, swarm):
                 sub_swarm = self.__find_neighborhood(particle, swarm)
-                return min(sub_swarm, key=lambda p: p.fitness)
+                return find_best(sub_swarm)
 
         return SocialCommunication()
 
@@ -93,7 +97,7 @@ class Communication(object):
 
             def __call__(self, particle, swarm):
                 sub_swarm = self.__find_neighborhood(particle, swarm)
-                return min(sub_swarm, key=lambda p: p.fitness)
+                return find_best(sub_swarm)
 
         return NearestCommunication()
 
@@ -108,7 +112,7 @@ class Communication(object):
 
             def __call__(self, particle, swarm):
                 if particle == self.__focal_particle:
-                    return min(swarm, key=lambda p: p.fitness)
+                    return find_best(swarm)
                 else:
                     return self.__focal_particle
 
