@@ -17,8 +17,8 @@ objective_functions = [
 ]
 
 inertia_strategies = [
-    Inertia.constant(weight=0.8),
-    Inertia.linear(min_weight=0.4, max_weight=0.9, iterations=10000),
+    #Inertia.constant(weight=0.8),
+    #Inertia.linear(min_weight=0.4, max_weight=0.9, iterations=10000),
     Inertia.clerc()
 ]
 

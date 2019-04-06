@@ -18,7 +18,7 @@ class Inertia(object):
     def linear(min_weight=0.4, max_weight=0.9, iterations=10000):
         class LinearInertia(object):
             def __init__(self):
-                self.__a = - ((max_weight - min_weight) / iterations)
+                self.__a = ((max_weight - min_weight) / iterations) * -1
                 self.__b = max_weight
 
             def __call__(self, it, *args, **kwargs):
@@ -31,10 +31,10 @@ class Inertia(object):
         class ClercRestrictionInertia(object):
             def __call__(self, it, c1, c2):
                 t = c1 + c2
-                a = t - 2.0
+                a = 2.0 - t
                 b = math.sqrt((t ** 2) - (4.0 * t))
 
-                k = 2.0 / (a + b)
+                k = 2.0 / math.fabs(a - b)
                 return k, k
 
         return ClercRestrictionInertia()

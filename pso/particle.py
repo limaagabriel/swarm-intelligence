@@ -41,20 +41,26 @@ class Particle(object):
 
         self.__speed = inertia + cognitive_component + social_component
         self.__position = self.__position + self.__speed
-        self.__restrict_to_fn_boundaries()
 
     def evaluate(self):
-        fitness = self.__fn(self.__position)
+        if not self.__is_out_of_bounds():
+            fitness = self.__fn(self.__position)
 
-        if fitness <= self.__fitness:
-            self.__fitness = fitness
-            self.cognitive_reference = self.__position
+            if fitness <= self.__fitness:
+                self.__fitness = fitness
+                self.cognitive_reference = self.__position
 
     def distance_to(self, other):
         def squared_euclidean(a, b):
             return np.sum(np.square(a - b))
 
         return squared_euclidean(self.position, other.position)
+
+    def __is_out_of_bounds(self):
+        lower_bounds = self.__position < self.__fn.minf
+        upper_bounds = self.__position > self.__fn.maxf
+
+        return lower_bounds.any() or upper_bounds.any()
 
     def __restrict_to_fn_boundaries(self):
         self.__position[self.__position < self.__fn.minf] = self.__fn.minf
