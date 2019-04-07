@@ -1,4 +1,6 @@
 from pso.particle import Particle
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 class PSO(object):
@@ -11,7 +13,7 @@ class PSO(object):
         self.__inertia = inertia
         self.__communication = communication
 
-    def optimize(self, fn, iterations=10000):
+    def optimize(self, fn, iterations=10000, visualize=False):
         fitness_evolution = []
 
         swarm = self.__create_swarm(fn)
@@ -19,6 +21,9 @@ class PSO(object):
 
         for it in range(iterations):
             a, b = self.__inertia(it, self.__c1, self.__c2)
+
+            if visualize:
+                self.__visualize(swarm, fn)
 
             for particle in swarm:
                 p = self.__communication(particle, swarm)
@@ -30,6 +35,28 @@ class PSO(object):
 
         p = self.__find_best(swarm)
         return p.position, p.fitness, fitness_evolution
+
+    @staticmethod
+    def __visualize(swarm, fn):
+        def position_mapper(particle):
+            return particle.position
+
+        def speed_mapper(particle):
+            return particle.speed
+
+        num_samples = fn.maxf - fn.minf
+        domain = np.linspace(fn.minf, fn.maxf, num_samples)
+        x, y = np.meshgrid(domain.copy(), domain.copy())
+        z = fn(np.array([x, y]))
+
+        p = np.array(list(map(position_mapper, swarm)))
+        s = np.array(list(map(speed_mapper, swarm)))
+
+        plt.pcolormesh(x, y, z, cmap='RdBu')
+        plt.quiver(p[:,0], p[:,1], s[:,0], s[:,1])
+        plt.show()
+        plt.clf()
+        plt.close()
 
     def __create_swarm(self, fn):
         swarm_range = range(self.__n_particles)

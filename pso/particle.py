@@ -28,12 +28,20 @@ class Particle(object):
         return self.__fitness
 
     @property
+    def current_fitness(self):
+        return self.__fn(self.__position)
+
+    @property
     def position(self):
         return self.__position
 
+    @property
+    def speed(self):
+        return self.__speed
+
     def update(self, a, b, c1, c2):
-        r1 = np.random.random()
-        r2 = np.random.random()
+        r1 = np.random.random(self.__position.shape)
+        r2 = np.random.random(self.__position.shape)
 
         inertia = a * self.__speed
         cognitive_component = b * c1 * r1 * (self.cognitive_reference - self.__position)
