@@ -4,13 +4,16 @@ from benchmark import functions
 from pso.strategies import Inertia
 from pso.strategies import Communication
 
+import os
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-dimensions = 2
+dimensions = 30
 n_particles = 30
 iterations = 10000
-statistical_sample_size = 1
+statistical_sample_size = 30
 social_coefficient = 2.05
 cognitive_coefficient = 2.05
 
@@ -28,18 +31,22 @@ inertia_strategies = [
 
 communication_strategies = [
     Communication.fully_connected(),
-    Communication.nearest_connected(n_neighbors=2),
+    # Communication.nearest_connected(n_neighbors=2),
     Communication.socially_connected(),
     Communication.focal_connected()
 ]
 
 cases = list(product(objective_functions, inertia_strategies))
+communication_names = list(map(lambda x: x.name, communication_strategies))
+
+if not os.path.exists('results'):
+    os.mkdir('results')
 
 for fn, inertia_strategy in cases:
-    for communication_strategy in communication_strategies:
-        evolution_acc = np.zeros(iterations)
-        fitness_sample = np.zeros(statistical_sample_size)
+    evolution_acc = np.zeros((len(communication_strategies), iterations))
+    fitness_sample = np.zeros((len(communication_strategies), statistical_sample_size))
 
+    for index, communication_strategy in enumerate(communication_strategies):
         for i in range(statistical_sample_size):
             pso = PSO(n_particles=n_particles,
                       social=social_coefficient,
@@ -58,7 +65,23 @@ for fn, inertia_strategy in cases:
             )
 
             print('{} - {}, {}, {}: {}'.format(*result_summary))
-            fitness_sample[i] = best_fitness
-            evolution_acc += fitness_evolution / float(statistical_sample_size)
+            fitness_sample[index, i] = best_fitness
+            evolution_acc[index] += fitness_evolution / float(statistical_sample_size)
 
+    plt.plot(evolution_acc.transpose())
+    plt.xlabel('Number of iterations')
+    plt.ylabel('Fitness')
+    plt.legend(communication_names)
 
+    plt.savefig(os.path.join('results', '{}{}Evolution.png'.format(fn.name, inertia_strategy.__class__.__name__)))
+    plt.clf()
+    plt.close()
+
+    plt.boxplot(fitness_sample.transpose())
+    plt.xticks(np.arange(1, len(communication_names) + 1), communication_names)
+    plt.xlabel('Communication strategy')
+    plt.ylabel('Best fitness')
+
+    plt.savefig(os.path.join('results', '{}{}Boxplot.png'.format(fn.name, inertia_strategy.__class__.__name__)))
+    plt.clf()
+    plt.close()

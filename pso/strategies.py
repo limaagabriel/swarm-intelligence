@@ -1,4 +1,5 @@
 import math
+import numpy as np
 
 
 def find_best(swarm):
@@ -47,6 +48,10 @@ class Communication(object):
             def initialize(self, swarm):
                 pass
 
+            @property
+            def name(self):
+                return 'Global'
+
             def __call__(self, particle, swarm):
                 return find_best(swarm)
 
@@ -57,6 +62,10 @@ class Communication(object):
         class SocialCommunication(object):
             def initialize(self, swarm):
                 pass
+
+            @property
+            def name(self):
+                return 'Social'
 
             @staticmethod
             def __find_neighborhood(particle, swarm):
@@ -85,6 +94,10 @@ class Communication(object):
             def initialize(self, swarm):
                 pass
 
+            @property
+            def name(self):
+                return 'Nearest'
+
             @staticmethod
             def __find_neighborhood(particle, swarm):
                 def fn(p):
@@ -108,7 +121,12 @@ class Communication(object):
                 self.__focal_particle = None
 
             def initialize(self, swarm):
-                self.__focal_particle = swarm[0]
+                index = np.random.random() * len(swarm)
+                self.__focal_particle = swarm[int(index)]
+
+            @property
+            def name(self):
+                return 'Focal'
 
             def __call__(self, particle, swarm):
                 if particle == self.__focal_particle:
