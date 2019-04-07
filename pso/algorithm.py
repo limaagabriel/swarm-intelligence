@@ -14,6 +14,7 @@ class PSO(object):
         self.__communication = communication
 
     def optimize(self, fn, iterations=10000, visualize=False):
+        best_particle = None
         fitness_evolution = []
 
         swarm = self.__create_swarm(fn)
@@ -33,8 +34,10 @@ class PSO(object):
             for particle in swarm:
                 particle.evaluate()
 
-        p = self.__find_best(swarm)
-        return p.position, p.fitness, fitness_evolution
+            best_particle = self.__find_best(swarm)
+            fitness_evolution.append(best_particle.fitness)
+
+        return best_particle.position, best_particle.fitness, np.array(fitness_evolution)
 
     @staticmethod
     def __visualize(swarm, fn):
