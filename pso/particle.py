@@ -3,15 +3,16 @@ import numpy as np
 
 
 class Particle(object):
-    def __init__(self, fn):
+    def __init__(self, fn, max_speed=0.5):
         self.__fn = fn
         self.__id = str(uuid.uuid4())
 
-        mean = (fn.minf + fn.maxf) / 2.0
-        std_dev = min(np.abs(fn.minf), np.abs(fn.maxf)) / 2.0
+        fn_range = fn.max - fn.min
+        mean, std_dev = fn.region_scaling()
 
-        self.__speed = np.random.normal(0.0, 1.0, fn.dim)
-        self.__position = np.random.normal(mean, std_dev, fn.dim)
+        self.__max_speed = max_speed * fn_range
+        self.__speed = np.random.random(fn.dimensions) - 0.5
+        self.__position = np.random.normal(mean, std_dev, fn.dimensions)
         self.__restrict_to_fn_boundaries()
 
         self.__fitness = fn(self.__position)
@@ -48,10 +49,11 @@ class Particle(object):
         social_component = b * c2 * r2 * (self.social_reference - self.__position)
 
         self.__speed = inertia + cognitive_component + social_component
+        self.__restrict_speed()
         self.__position = self.__position + self.__speed
 
     def evaluate(self):
-        if not self.__is_out_of_bounds():
+        if not self.is_out_of_bounds():
             fitness = self.__fn(self.__position)
 
             if fitness <= self.__fitness:
@@ -64,15 +66,19 @@ class Particle(object):
 
         return squared_euclidean(self.position, other.position)
 
-    def __is_out_of_bounds(self):
-        lower_bounds = self.__position < self.__fn.minf
-        upper_bounds = self.__position > self.__fn.maxf
+    def is_out_of_bounds(self):
+        lower_bounds = self.__position <= self.__fn.min
+        upper_bounds = self.__position >= self.__fn.max
 
         return lower_bounds.any() or upper_bounds.any()
 
+    def __restrict_speed(self):
+        self.__speed[self.__speed > self.__max_speed] = self.__max_speed
+        self.__speed[self.__speed < -self.__max_speed] = -self.__max_speed
+
     def __restrict_to_fn_boundaries(self):
-        self.__position[self.__position < self.__fn.minf] = self.__fn.minf
-        self.__position[self.__position > self.__fn.maxf] = self.__fn.maxf
+        self.__position[self.__position < self.__fn.min] = self.__fn.min
+        self.__position[self.__position > self.__fn.max] = self.__fn.max
 
     def __eq__(self, other):
         return self.id == other.id

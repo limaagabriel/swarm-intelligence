@@ -47,16 +47,18 @@ class PSO(object):
         def speed_mapper(particle):
             return particle.speed
 
-        num_samples = fn.maxf - fn.minf
-        domain = np.linspace(fn.minf, fn.maxf, num_samples)
+        num_samples = fn.max - fn.min
+        domain = np.linspace(fn.min, fn.max, num_samples)
         x, y = np.meshgrid(domain.copy(), domain.copy())
         z = fn(np.array([x, y]))
 
         p = np.array(list(map(position_mapper, swarm)))
         s = np.array(list(map(speed_mapper, swarm)))
 
+        colors = np.zeros(p[:,0].shape)
+        colors[0] = 1
         plt.pcolormesh(x, y, z, cmap='RdBu')
-        plt.quiver(p[:,0], p[:,1], s[:,0], s[:,1])
+        plt.quiver(p[:,0], p[:,1], s[:,0], s[:,1], colors)
         plt.show()
         plt.clf()
         plt.close()
