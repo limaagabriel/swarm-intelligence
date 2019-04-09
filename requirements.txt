@@ -1,5 +1,4 @@
 cycler==0.10.0
-deap==1.2.2
 kiwisolver==1.0.1
 matplotlib==3.0.3
 numpy==1.16.2
