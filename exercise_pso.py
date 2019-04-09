@@ -31,7 +31,7 @@ inertia_strategies = [
 
 communication_strategies = [
     Communication.fully_connected(),
-    Communication.nearest_connected(n_neighbors=3),
+    Communication.nearest_connected(n_neighbors=2),
     # Communication.socially_connected(),
     Communication.focal_connected()
 ]
