@@ -50,7 +50,7 @@ class PSO(object):
         num_samples = fn.max - fn.min
         domain = np.linspace(fn.min, fn.max, num_samples)
         x, y = np.meshgrid(domain.copy(), domain.copy())
-        z = fn(np.array([x, y]))
+        z = fn.evaluate(fn, x, y)
 
         p = np.array(list(map(position_mapper, swarm)))
         s = np.array(list(map(speed_mapper, swarm)))

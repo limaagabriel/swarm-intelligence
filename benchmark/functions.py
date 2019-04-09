@@ -1,55 +1,49 @@
-from deap.benchmarks import sphere, rosenbrock, rastrigin
-from deap.benchmarks.tools import translate, rotate
+import numpy as np
 
 
 class ObjectiveFunction(object):
-    def __init__(self, name, dimensions, min, max):
+    def __init__(self, name, dimensions, bounds):
         self.name = name
-        self.min = min
-        self.max = max
+        self.min = bounds[0]
+        self.max = bounds[1]
         self.dimensions = dimensions
 
-    def evaluate(self, x):
-        pass
+    def random_region_scaling(self):
+        x = self.max / 2.0
+        return (np.random.random(self.dimensions) * x) + x
+
+    def __call__(self, x):
+        return 0
+
+    @np.vectorize
+    def evaluate(self, x, y):
+        return self(np.array([x, y]))
 
 
 class SphereFunction(ObjectiveFunction):
     def __init__(self, dim):
-        super(SphereFunction, self).__init__('Sphere', dim, -100.0, 100.0)
-
-    @staticmethod
-    def region_scaling():
-        mean = 50
-        std_dev = 5
-        return mean, std_dev
+        super(SphereFunction, self).__init__('Sphere', dim, (-100.0, 100.0))
 
     def __call__(self, x):
-        return sphere(x)[0]
+        return (x ** 2).sum()
 
 
 class RosenbrockFunction(ObjectiveFunction):
     def __init__(self, dim):
-        super(RosenbrockFunction, self).__init__('Rosenbrock', dim, -30.0, 30.0)
-
-    @staticmethod
-    def region_scaling():
-        mean = 20
-        std_dev = 2
-        return mean, std_dev
+        super(RosenbrockFunction, self).__init__('Rosenbrock', dim, (-30.0, 30.0))
 
     def __call__(self, x):
-        return rosenbrock(x)[0]
+        a = x[1:] - (x[:-1] ** 2)
+        b = x[:1] - 1
+        y = 100 * (a ** 2) + (b ** 2)
+
+        return y.sum()
 
 
 class RastriginFunction(ObjectiveFunction):
     def __init__(self, dim):
-        super(RastriginFunction, self).__init__('Rastrigin', dim, -5.12, 5.12)
-
-    @staticmethod
-    def region_scaling():
-        mean = -3
-        std_dev = 1
-        return mean, std_dev
+        super(RastriginFunction, self).__init__('Rastrigin', dim, (-5.12, 5.12))
 
     def __call__(self, x):
-        return rastrigin(x)[0]
+        y = (x ** 2) - 10 * np.cos(2.0 * np.pi * x) + 10
+        return y.sum()
