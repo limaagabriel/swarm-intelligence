@@ -7,8 +7,9 @@ from pso.strategies import Communication
 import os
 import numpy as np
 import matplotlib
-matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+
+matplotlib.use('Agg')
 
 dimensions = 30
 n_particles = 30
@@ -31,8 +32,7 @@ inertia_strategies = [
 
 communication_strategies = [
     Communication.fully_connected(),
-    Communication.nearest_connected(n_neighbors=2),
-    # Communication.socially_connected(),
+    Communication.nearest_connected(n_neighbors=5),
     Communication.focal_connected()
 ]
 

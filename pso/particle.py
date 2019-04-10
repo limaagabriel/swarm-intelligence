@@ -8,11 +8,10 @@ class Particle(object):
         self.__id = str(uuid.uuid4())
 
         fn_range = fn.max - fn.min
-        mean, std_dev = fn.region_scaling()
 
         self.__max_speed = max_speed * fn_range
         self.__speed = np.random.random(fn.dimensions) - 0.5
-        self.__position = np.random.normal(mean, std_dev, fn.dimensions)
+        self.__position = fn.random_region_scaling()
         self.__restrict_to_fn_boundaries()
 
         self.__fitness = fn(self.__position)
