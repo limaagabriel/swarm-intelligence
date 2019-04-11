@@ -3,14 +3,12 @@ import numpy as np
 
 
 class Particle(object):
-    def __init__(self, fn, max_speed=0.5):
+    def __init__(self, fn, max_speed=1.0):
         self.__fn = fn
         self.__id = str(uuid.uuid4())
+        self.__max_speed = max_speed * (fn.max - fn.min)
 
-        fn_range = fn.max - fn.min
-
-        self.__max_speed = max_speed * fn_range
-        self.__speed = np.random.random(fn.dimensions) - 0.5
+        self.__speed = np.zeros(fn.dimensions)
         self.__position = fn.random_region_scaling()
         self.__restrict_to_fn_boundaries()
 
@@ -40,8 +38,8 @@ class Particle(object):
         return self.__speed
 
     def update(self, a, b, c1, c2):
-        r1 = np.random.random(self.__position.shape)
-        r2 = np.random.random(self.__position.shape)
+        r1 = np.random.uniform(0.0, 1.0, self.__fn.dimensions)
+        r2 = np.random.uniform(0.0, 1.0, self.__fn.dimensions)
 
         inertia = a * self.__speed
         cognitive_component = b * c1 * r1 * (self.cognitive_reference - self.__position)
@@ -55,7 +53,7 @@ class Particle(object):
         if not self.is_out_of_bounds():
             fitness = self.__fn(self.__position)
 
-            if fitness <= self.__fitness:
+            if fitness < self.__fitness:
                 self.__fitness = fitness
                 self.cognitive_reference = self.__position
 

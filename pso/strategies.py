@@ -80,7 +80,7 @@ class Communication(object):
                 elif right_index >= swarm_length:
                     right_index = 0
 
-                return [swarm[left_index], swarm[right_index]]
+                return [swarm[left_index], particle, swarm[right_index]]
 
             def __call__(self, particle, swarm):
                 sub_swarm = self.__find_neighborhood(particle, swarm)
