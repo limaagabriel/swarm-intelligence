@@ -39,8 +39,9 @@ communication_strategies = [
 cases = list(product(objective_functions, inertia_strategies))
 communication_names = list(map(lambda x: x.name, communication_strategies))
 
-if not os.path.exists('results'):
-    os.mkdir('results')
+target_directory = os.path.join('results', 'pso')
+if not os.path.exists(target_directory):
+    os.mkdir(target_directory)
 
 for fn, inertia_strategy in cases:
     evolution_acc = np.zeros((len(communication_strategies), iterations))
@@ -73,7 +74,7 @@ for fn, inertia_strategy in cases:
     plt.ylabel('Fitness')
     plt.legend(communication_names)
 
-    plt.savefig(os.path.join('results', '{}{}Evolution.png'.format(fn.name, inertia_strategy.__class__.__name__)))
+    plt.savefig(os.path.join(target_directory, '{}{}Evolution.png'.format(fn.name, inertia_strategy.__class__.__name__)))
     plt.clf()
     plt.close()
 
@@ -82,6 +83,6 @@ for fn, inertia_strategy in cases:
     plt.xlabel('Communication strategy')
     plt.ylabel('Best fitness')
 
-    plt.savefig(os.path.join('results', '{}{}Boxplot.png'.format(fn.name, inertia_strategy.__class__.__name__)))
+    plt.savefig(os.path.join(target_directory, '{}{}Boxplot.png'.format(fn.name, inertia_strategy.__class__.__name__)))
     plt.clf()
     plt.close()
