@@ -8,12 +8,20 @@ class ObjectiveFunction(object):
         self.max = bounds[1]
         self.dimensions = dimensions
 
+        self.__evaluations = 0
+
+    @property
+    def evaluations(self):
+        return self.__evaluations
+
     def random_region_scaling(self):
-        x = self.max / 2.0
-        return (np.random.random(self.dimensions) * x) + x
+        a = self.max / 2.0
+        b = self.max
+        return np.random.uniform(a, b, self.dimensions)
 
     def __call__(self, x):
-        return 0
+        self.__evaluations += 1
+        return self.run(x)
 
     @np.vectorize
     def evaluate(self, x, y):
@@ -24,7 +32,7 @@ class SphereFunction(ObjectiveFunction):
     def __init__(self, dim):
         super(SphereFunction, self).__init__('Sphere', dim, (-100.0, 100.0))
 
-    def __call__(self, x):
+    def run(self, x):
         return (x ** 2).sum()
 
 
@@ -32,7 +40,7 @@ class RosenbrockFunction(ObjectiveFunction):
     def __init__(self, dim):
         super(RosenbrockFunction, self).__init__('Rosenbrock', dim, (-30.0, 30.0))
 
-    def __call__(self, x):
+    def run(self, x):
         a = x[1:] - (x[:-1] ** 2)
         b = x[:1] - 1
         y = 100 * (a ** 2) + (b ** 2)
@@ -44,6 +52,6 @@ class RastriginFunction(ObjectiveFunction):
     def __init__(self, dim):
         super(RastriginFunction, self).__init__('Rastrigin', dim, (-5.12, 5.12))
 
-    def __call__(self, x):
+    def run(self, x):
         y = (x ** 2) - 10 * np.cos(2.0 * np.pi * x) + 10
         return y.sum()

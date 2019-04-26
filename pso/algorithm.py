@@ -13,14 +13,16 @@ class PSO(object):
         self.__inertia = inertia
         self.__communication = communication
 
-    def optimize(self, fn, iterations=10000, visualize=False):
+    def optimize(self, fn, stop_criterion, visualize=False):
+        it = 0
         best_particle = None
         fitness_evolution = []
 
         swarm = self.__create_swarm(fn)
         self.__communication.initialize(swarm)
 
-        for it in range(iterations):
+        while not stop_criterion(iterations=it, fn=fn):
+            it = it + 1
             a, b = self.__inertia(it, self.__c1, self.__c2)
 
             if visualize:
