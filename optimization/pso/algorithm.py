@@ -1,4 +1,4 @@
-from pso.particle import Particle
+from optimization.pso.particle import Particle
 import matplotlib.pyplot as plt
 import numpy as np
 

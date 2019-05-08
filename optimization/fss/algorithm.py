@@ -2,7 +2,7 @@ import sys
 import numpy as np
 
 from util import foreach
-from fss.fish import Fish
+from optimization.fss.fish import Fish
 
 
 class FSS(object):
