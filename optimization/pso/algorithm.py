@@ -1,11 +1,12 @@
 from optimization.pso.particle import Particle
+from optimization import SwarmOptimizationMethod
 import matplotlib.pyplot as plt
 import numpy as np
 
 
-class PSO(object):
+class PSO(SwarmOptimizationMethod):
     def __init__(self, n_particles, social, cognitive, inertia, communication):
-        self.__n_particles = n_particles
+        super().__init__(Particle, n_particles)
 
         self.__c1 = cognitive
         self.__c2 = social
@@ -13,33 +14,27 @@ class PSO(object):
         self.__inertia = inertia
         self.__communication = communication
 
-    def optimize(self, fn, stop_criterion, visualize=False):
+    def __call__(self, fn, stop_criterion, tracker):
         it = 0
         best_particle = None
-        fitness_evolution = []
-
-        swarm = self.__create_swarm(fn)
-        self.__communication.initialize(swarm)
+        self.__communication.initialize(self.swarm)
 
         while not stop_criterion(iterations=it, fn=fn):
             it = it + 1
             a, b = self.__inertia(it, self.__c1, self.__c2)
 
-            if visualize:
-                self.__visualize(swarm, fn)
-
-            for particle in swarm:
-                p = self.__communication(particle, swarm)
+            for particle in self.swarm:
+                p = self.__communication(particle, self.swarm)
                 particle.social_reference = p.cognitive_reference
                 particle.update(a, b, self.__c1, self.__c2)
 
-            for particle in swarm:
+            for particle in self.swarm:
                 particle.evaluate()
 
-            best_particle = self.__find_best(swarm)
-            fitness_evolution.append(best_particle.fitness)
+            best_particle = self.get_best_agent()
+            tracker.track_by_iterations(best_particle.fitness)
 
-        return best_particle.position, best_particle.fitness, np.array(fitness_evolution)
+        return best_particle.position, best_particle.fitness
 
     @staticmethod
     def __visualize(swarm, fn):
@@ -64,11 +59,3 @@ class PSO(object):
         plt.show()
         plt.clf()
         plt.close()
-
-    def __create_swarm(self, fn):
-        swarm_range = range(self.__n_particles)
-        return [Particle(fn) for _ in swarm_range]
-
-    @staticmethod
-    def __find_best(swarm):
-        return min(swarm, key=lambda p: p.fitness)

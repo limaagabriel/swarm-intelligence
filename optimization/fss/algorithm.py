@@ -3,39 +3,39 @@ import numpy as np
 
 from util import foreach
 from optimization.fss.fish import Fish
+from optimization import SwarmOptimizationMethod
 
 
-class FSS(object):
+class FSS(SwarmOptimizationMethod):
     def __init__(self, n_fishes, step):
-        self.__n_fishes = n_fishes
+        super().__init__(Fish, n_fishes)
         self.__step = step
 
-    def optimize(self, fn, stop_criterion):
+    def __call__(self, fn, stop_criterion, tracker):
         it = 0
         improvements = 0
         best_position = None
         best_fitness = sys.maxsize
-        school = self.__create_school(fn)
 
         while not stop_criterion(iterations=it, evaluations=fn.evaluations):
             it = it + 1
 
-            school_weight_1 = sum(map(lambda x: x.weight, school))
-            foreach(lambda f: f.individual_step(self.__step), school)
+            school_weight_1 = sum(map(lambda x: x.weight, self.swarm))
+            foreach(lambda f: f.individual_step(self.__step), self.swarm)
 
-            max_improvement = self.__find_max_improvement(school)
-            foreach(lambda f: f.feed(max_improvement), school)
-            school_weight_2 = sum(map(lambda x: x.weight, school))
+            max_improvement = self.__find_max_improvement(self.swarm)
+            foreach(lambda f: f.feed(max_improvement), self.swarm)
+            school_weight_2 = sum(map(lambda x: x.weight, self.swarm))
 
-            drift = self.__find_drift(school)
-            foreach(lambda f: f.instinctive_step(drift), school)
+            drift = self.__find_drift(self.swarm)
+            foreach(lambda f: f.instinctive_step(drift), self.swarm)
 
-            barycenter = self.__find_barycenter(school)
+            barycenter = self.__find_barycenter(self.swarm)
             success = school_weight_2 > school_weight_1
-            foreach(lambda f: f.volitive_step(self.__step, barycenter, success), school)
+            foreach(lambda f: f.volitive_step(self.__step, barycenter, success), self.swarm)
 
             self.__step.update(stop_criterion, iterations=it, evaluations=fn.evaluations)
-            best_fish = min(school, key=lambda x: x.fitness)
+            best_fish = self.get_best_agent()
 
             if best_fish.fitness < best_fitness:
                 best_fitness = best_fish.fitness
@@ -43,11 +43,10 @@ class FSS(object):
                 improvements = improvements + 1
                 print('min updated {}'.format(best_fitness))
 
-        print('fitness improved {} times'.format(improvements))
-        return best_position, best_fitness, []
+            tracker.track_by_iterations(best_fitness)
 
-    def __create_school(self, fn):
-        return [Fish(fn, 1) for _ in range(self.__n_fishes)]
+        print('fitness improved {} times'.format(improvements))
+        return best_position, best_fitness
 
     @staticmethod
     def __find_max_improvement(school):

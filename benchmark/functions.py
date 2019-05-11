@@ -1,27 +1,41 @@
 import numpy as np
+from abc import ABC
+from abc import abstractmethod
 
 
-class ObjectiveFunction(object):
+class ObjectiveFunction(ABC):
     def __init__(self, name, dimensions, bounds):
         self.name = name
         self.min = bounds[0]
         self.max = bounds[1]
         self.dimensions = dimensions
 
+        self.__listeners = []
         self.__evaluations = 0
+
+    def on_call(self, fn):
+        self.__listeners.append(fn)
 
     @property
     def evaluations(self):
         return self.__evaluations
 
-    def random_region_scaling(self):
+    def search_space_initializer(self):
         a = self.max / 2.0
         b = self.max
         return np.random.uniform(a, b, self.dimensions)
 
     def __call__(self, x):
         self.__evaluations += 1
-        return self.run(x)
+        r = self.run(x)
+
+        for listener in self.__listeners:
+            listener(self, r)
+        return r
+
+    @abstractmethod
+    def run(self, x):
+        pass
 
     @np.vectorize
     def evaluate(self, x, y):

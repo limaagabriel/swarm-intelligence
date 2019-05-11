@@ -1,5 +1,5 @@
-from fss import FSS
-from fss.strategies import Step
+from optimization.fss import FSS
+from optimization.fss.strategies import Step
 from benchmark.stop import StopCriterion
 from benchmark.functions import SphereFunction
 

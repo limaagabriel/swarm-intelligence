@@ -1,8 +1,9 @@
-from pso import PSO
+from optimization.pso import PSO
 from itertools import product
 from benchmark import functions
-from pso.strategies import Inertia
-from pso.strategies import Communication
+from benchmark.stop import StopCriterion
+from optimization.pso.strategies import Inertia
+from optimization.pso.strategies import Communication
 
 import os
 import numpy as np
@@ -55,7 +56,7 @@ for fn, inertia_strategy in cases:
                       inertia=inertia_strategy,
                       communication=communication_strategy)
 
-            best, best_fitness, fitness_evolution = pso.optimize(fn, iterations=iterations)
+            best, best_fitness, tracker = pso.optimize(fn, stop_criterion=StopCriterion.iteration_limit(iterations))
 
             result_summary = (
                 i + 1,
@@ -67,7 +68,7 @@ for fn, inertia_strategy in cases:
 
             print('{} - {}, {}, {}: {}'.format(*result_summary))
             fitness_sample[index, i] = best_fitness
-            evolution_acc[index] += fitness_evolution / float(statistical_sample_size)
+            evolution_acc[index] += tracker.iterations / float(statistical_sample_size)
 
     plt.plot(evolution_acc.transpose())
     plt.xlabel('Number of iterations')

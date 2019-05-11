@@ -1,6 +1,9 @@
-class StopCriterionDefinition(object):
+from abc import ABC
+
+
+class StopCriterionDefinition(ABC):
     def __call__(self, **kwargs):
-        return kwargs[self.keyword] > self.limit
+        return kwargs[self.keyword] >= self.limit
 
     def count(self, **kwargs):
         return kwargs[self.keyword]
