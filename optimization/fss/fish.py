@@ -39,9 +39,9 @@ class Fish(Agent):
         self.__improvement = fx - fn
 
         if self.__improvement > 0:
+            self.__displacement = n - self.position
             self.position = n
             self.fitness = fn
-            self.__displacement = n - self.position
 
     def feed(self, max_improvement):
         if max_improvement != 0:

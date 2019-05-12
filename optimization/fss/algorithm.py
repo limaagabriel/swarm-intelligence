@@ -13,7 +13,6 @@ class FSS(SwarmOptimizationMethod):
 
     def __call__(self, fn, stop_criterion, tracker):
         it = 0
-        improvements = 0
         best_position = None
         best_fitness = sys.maxsize
 
@@ -40,27 +39,22 @@ class FSS(SwarmOptimizationMethod):
             if best_fish.fitness < best_fitness:
                 best_fitness = best_fish.fitness
                 best_position = best_fish.position
-                improvements = improvements + 1
-                print('min updated {}'.format(best_fitness))
 
             tracker.track_by_iterations(best_fitness)
-
-        print('fitness improved {} times'.format(improvements))
         return best_position, best_fitness
 
     @staticmethod
     def __find_max_improvement(school):
-        best_fish = max(school, key=lambda f: f.improvement)
-        return best_fish.improvement
+        best_fish = max(school, key=lambda f: np.abs(f.improvement))
+        return np.abs(best_fish.improvement)
 
     @staticmethod
     def __find_drift(school):
-        a = sum(map(lambda x: x.displacement * max(0, x.improvement), school))
-        b = sum(map(lambda x: max(0, x.improvement), school))
+        a = sum(map(lambda x: x.displacement * x.improvement, school))
+        b = sum(map(lambda x: x.improvement, school))
 
         if b > 0:
             return a / b
-
         return np.zeros(school[0].position.shape)
 
     @staticmethod

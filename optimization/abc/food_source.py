@@ -30,6 +30,8 @@ class FoodSource(Agent):
         i = np.random.choice(range(self.fn.dimensions))
 
         v[i] = v[i] + phi * (v[i] - reference[i])
+        v[v > self.fn.max] = self.fn.max
+        v[v < self.fn.min] = self.fn.min
         v_fitness = self.fn(v)
 
         if v_fitness < self.fitness:

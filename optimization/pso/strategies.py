@@ -6,31 +6,42 @@ def find_best(swarm):
     return min(swarm, key=lambda p: p.fitness)
 
 
+class InertiaDefinition(object):
+    def __call__(self, *args, **kwargs):
+        return 1.0, 1.0
+
+    def update(self, *args, **kwargs):
+        pass
+
+
 class Inertia(object):
     @staticmethod
     def constant(weight=0.8):
-        class ConstantInertia(object):
+        class ConstantInertia(InertiaDefinition):
             def __call__(self, *args, **kwargs):
                 return weight, 1.0
 
         return ConstantInertia()
 
     @staticmethod
-    def linear(min_weight=0.4, max_weight=0.9, iterations=10000):
-        class LinearInertia(object):
+    def linear(min_weight=0.4, max_weight=0.9):
+        class LinearInertia(InertiaDefinition):
             def __init__(self):
-                self.__a = ((max_weight - min_weight) / iterations) * -1
-                self.__b = max_weight
+                self.__i = max_weight
 
-            def __call__(self, it, *args, **kwargs):
-                return self.__a * it + self.__b, 1.0
+            def __call__(self, *args, **kwargs):
+                return self.__i, 1.0
+
+            def update(self, stop_criterion, **kwargs):
+                v = (max_weight - min_weight) * stop_criterion.count(**kwargs)
+                self.__i = max_weight - (v / stop_criterion.limit)
 
         return LinearInertia()
 
     @staticmethod
     def clerc():
-        class ClercRestrictionInertia(object):
-            def __call__(self, it, c1, c2):
+        class ClercRestrictionInertia(InertiaDefinition):
+            def __call__(self, c1, c2):
                 t = c1 + c2
                 a = 2.0 - t
                 b = math.sqrt((t ** 2) - (4.0 * t))

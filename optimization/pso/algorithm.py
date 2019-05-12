@@ -19,9 +19,9 @@ class PSO(SwarmOptimizationMethod):
         best_particle = None
         self.__communication.initialize(self.swarm)
 
-        while not stop_criterion(iterations=it, fn=fn):
+        while not stop_criterion(iterations=it, evaluations=fn.evaluations):
             it = it + 1
-            a, b = self.__inertia(it, self.__c1, self.__c2)
+            a, b = self.__inertia(self.__c1, self.__c2)
 
             for particle in self.swarm:
                 p = self.__communication(particle, self.swarm)
@@ -33,6 +33,9 @@ class PSO(SwarmOptimizationMethod):
 
             best_particle = self.get_best_agent()
             tracker.track_by_iterations(best_particle.fitness)
+            self.__inertia.update(stop_criterion,
+                                  iterations=it,
+                                  evaluations=fn.evaluations)
 
         return best_particle.position, best_particle.fitness
 
