@@ -6,7 +6,7 @@ def foreach(fn, collection):
         fn(item)
 
 
-def read_padded_csv(path, pad):
+def read_padded_csv(path, pad=None):
     max_length = 0
     lines = []
 
@@ -20,7 +20,11 @@ def read_padded_csv(path, pad):
             lines.append(c)
 
     for line in lines:
+        v = pad
+        if pad is None:
+            v = line[-1]
+
         while len(line) < max_length:
-            line.append(pad)
+            line.append(v)
 
     return np.array(lines)
