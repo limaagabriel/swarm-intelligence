@@ -16,7 +16,6 @@ class PSO(SwarmOptimizationMethod):
 
     def __call__(self, fn, stop_criterion, tracker):
         it = 0
-        best_particle = None
         self.__communication.initialize(self.swarm)
 
         while not stop_criterion(iterations=it, evaluations=fn.evaluations):
@@ -31,13 +30,13 @@ class PSO(SwarmOptimizationMethod):
             for particle in self.swarm:
                 particle.evaluate()
 
-            best_particle = self.get_best_agent()
-            tracker.track_by_iterations(best_particle.fitness)
+            self.update_best_solution()
+            tracker.track_by_iterations(self.best_fitness)
             self.__inertia.update(stop_criterion,
                                   iterations=it,
                                   evaluations=fn.evaluations)
 
-        return best_particle.position, best_particle.fitness
+        return self.best_position, self.best_fitness
 
     @staticmethod
     def __visualize(swarm, fn):

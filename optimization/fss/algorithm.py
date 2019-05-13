@@ -13,14 +13,13 @@ class FSS(SwarmOptimizationMethod):
 
     def __call__(self, fn, stop_criterion, tracker):
         it = 0
-        best_position = None
-        best_fitness = sys.maxsize
 
         while not stop_criterion(iterations=it, evaluations=fn.evaluations):
             it = it + 1
 
             school_weight_1 = sum(map(lambda x: x.weight, self.swarm))
             foreach(lambda f: f.individual_step(self.__step), self.swarm)
+            self.update_best_solution()
 
             max_improvement = self.__find_max_improvement(self.swarm)
             foreach(lambda f: f.feed(max_improvement), self.swarm)
@@ -34,14 +33,10 @@ class FSS(SwarmOptimizationMethod):
             foreach(lambda f: f.volitive_step(self.__step, barycenter, success), self.swarm)
 
             self.__step.update(stop_criterion, iterations=it, evaluations=fn.evaluations)
-            best_fish = self.get_best_agent()
+            self.update_best_solution()
 
-            if best_fish.fitness < best_fitness:
-                best_fitness = best_fish.fitness
-                best_position = best_fish.position
-
-            tracker.track_by_iterations(best_fitness)
-        return best_position, best_fitness
+            tracker.track_by_iterations(self.best_fitness)
+        return self.best_position, self.best_fitness
 
     @staticmethod
     def __find_max_improvement(school):

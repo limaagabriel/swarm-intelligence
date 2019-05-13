@@ -14,8 +14,6 @@ class ABC(SwarmOptimizationMethod):
 
     def __call__(self, fn, stop_criterion, tracker):
         it = 0
-        best_position = None
-        best_fitness = sys.maxsize
 
         while not stop_criterion(iterations=it, evaluations=fn.evaluations):
             it = it + 1
@@ -24,14 +22,11 @@ class ABC(SwarmOptimizationMethod):
             self.__calculate_probabilities()
             self.__onlooker_bees()
             self.__scout_bee()
+            self.update_best_solution()
 
-            best_food_source = self.get_best_agent()
-            if best_food_source.fitness < best_fitness:
-                best_fitness = best_food_source.fitness
-                best_position = best_food_source.position
-            tracker.track_by_iterations(best_fitness)
+            tracker.track_by_iterations(self.best_fitness)
 
-        return best_position, best_fitness
+        return self.best_position, self.best_fitness
 
     def __employed_bees(self):
         for idx, food_source in enumerate(self.swarm):

@@ -2,8 +2,8 @@ import os
 import tqdm
 import matplotlib
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
+from util import read_padded_csv
 
 from optimization.pso import PSO
 from optimization.fss import FSS
@@ -19,7 +19,7 @@ from optimization.pso.strategies import Communication
 dimensions = 30
 sample_size = 30
 fn_evaluations = 500000
-should_evaluate = False
+should_evaluate = True
 matplotlib.use('Agg')
 
 objective_functions = [
@@ -35,6 +35,9 @@ plot_directory = os.path.join(target_directory, 'plot')
 registry_directory = os.path.join(target_directory, 'reg')
 sample_base_path = os.path.join(registry_directory, '{}_{}_b.csv')
 evolution_base_path = os.path.join(registry_directory, '{}_{}_a.csv')
+
+if not os.path.exists('results'):
+    os.mkdir('results')
 
 if not os.path.exists(target_directory):
     os.mkdir(target_directory)
@@ -94,7 +97,7 @@ def plot(objective_function, paths):
 
     for i, method in tqdm.tqdm(enumerate(methods), total=len(methods)):
         sample = np.genfromtxt(paths[method]['sp'])
-        evolution = pd.read_csv(paths[method]['ev'], header=None).values
+        evolution = read_padded_csv(paths[method]['ev'], 0.0)
         evolution[np.isnan(evolution)] = 0.0
 
         samples[:, i] = sample.copy()

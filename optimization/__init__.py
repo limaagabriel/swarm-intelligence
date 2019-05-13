@@ -1,3 +1,4 @@
+import sys
 import uuid
 import numpy as np
 from abc import ABC
@@ -58,16 +59,19 @@ class SwarmOptimizationMethod(ABC):
         self.__size = swarm_size
         self.swarm = []
 
+        self.best_position = None
+        self.best_fitness = sys.maxsize
+
     def create_swarm(self, fn):
         self.swarm = [self.__agent_class(fn) for _ in range(self.__size)]
 
     def optimize(self, fn, stop_criterion):
         self.create_swarm(fn)
+        self.update_best_solution()
         tracker = FitnessTracker()
 
         def feed_tracker(*_):
-            agent = self.get_best_agent()
-            tracker.track_by_fn_evaluations(agent.fitness)
+            tracker.track_by_fn_evaluations(self.best_fitness)
 
         fn.on_call(feed_tracker)
         position, fitness = self(fn, stop_criterion, tracker)
@@ -77,6 +81,12 @@ class SwarmOptimizationMethod(ABC):
     def __call__(self, *args, **kwargs):
         pass
 
-    def get_best_agent(self):
+    def __get_best_agent(self):
         return min(self.swarm, key=lambda a: a.fitness)
 
+    def update_best_solution(self):
+        agent = self.__get_best_agent()
+
+        if agent.fitness < self.best_fitness:
+            self.best_fitness = agent.fitness
+            self.best_position = agent.position.copy()
