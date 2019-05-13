@@ -1,7 +1,8 @@
 import os
 import tqdm
-import numpy as np
 import matplotlib
+import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 
 from optimization.pso import PSO
@@ -18,6 +19,7 @@ from optimization.pso.strategies import Communication
 dimensions = 30
 sample_size = 30
 fn_evaluations = 500000
+should_evaluate = False
 matplotlib.use('Agg')
 
 objective_functions = [
@@ -40,16 +42,91 @@ if not os.path.exists(target_directory):
     os.mkdir(plot_directory)
 
 
-def run_method(method, fn, parameters):
-    fn_instance = fn(dimensions)
-    method_instance = method(**parameters)
-    stop_criterion = StopCriterion.fn_evaluation(fn_evaluations)
-    return method_instance.optimize(fn_instance, stop_criterion=stop_criterion)
+def evaluate(objective_function, paths):
+    def run_method(method, fn, parameters):
+        fn_instance = fn(dimensions)
+        method_instance = method(**parameters)
+        stop_criterion = StopCriterion.fn_evaluation(fn_evaluations)
+        return method_instance.optimize(fn_instance, stop_criterion=stop_criterion)
+
+    for _ in tqdm.tqdm(range(sample_size), total=sample_size):
+        results = {
+            'pso': run_method(PSO, objective_function, {
+                'n_particles': 30,
+                'social': 2.05,
+                'cognitive': 2.05,
+                'communication': Communication.socially_connected(),
+                'inertia': Inertia.linear(min_weight=0.4, max_weight=0.9)
+            }),
+
+            'fss': run_method(FSS, objective_function, {
+                'n_fishes': 30,
+                'step': Step.linear(individual=(0.1, 0.001),
+                                    volitive=(0.01, 0.001))
+            }),
+
+            'abc': run_method(ABC, objective_function, {
+                'colony_size': 30,
+                'trials': 100
+            })
+        }
+
+        for m in methods:
+            with open(paths[m]['sp'], 'a+') as f:
+                f.write(str(results[m][1]))
+                f.write('\n')
+
+            with open(paths[m]['ev'], 'a+') as f:
+                tracker = results[m][2]
+                evolution = tracker.fn_evaluations.tolist()
+                f.write(','.join(map(lambda t: '{:.2f}'.format(t), evolution)))
+                f.write('\n')
 
 
-if __name__ == '__main__':
+def plot(objective_function, paths):
+    figure_1 = plt.figure()
+    figure_2 = plt.figure()
+    samples = np.zeros((sample_size, len(methods)))
+
+    sample_figure = figure_1.add_subplot(111)
+    evolution_figure = figure_2.add_subplot(111)
+    names = list(map(lambda m: m.upper(), methods))
+
+    for i, method in tqdm.tqdm(enumerate(methods), total=len(methods)):
+        sample = np.genfromtxt(paths[method]['sp'])
+        evolution = pd.read_csv(paths[method]['ev'], header=None).values
+        evolution[np.isnan(evolution)] = 0.0
+
+        samples[:, i] = sample.copy()
+        evolution_figure.plot(evolution.mean(axis=0))
+
+    sample_figure.boxplot(samples)
+    sample_figure.set_xticklabels(names)
+    sample_figure.set_xlabel('Algorithm')
+    sample_figure.set_ylabel('Best fitness')
+    sample_figure.set_title('Best fitness: {}'.format(objective_function))
+
+    evolution_figure.set_xlabel('Function evaluation')
+    evolution_figure.set_ylabel('Fitness')
+    evolution_figure.legend(names)
+    evolution_figure.set_title('Evolution: {}'.format(objective_function))
+
+    sample_name = 'sp_{}.png'.format(objective_function)
+    evolution_name = 'ev_{}.png'.format(objective_function)
+
+    sample_figure.figure.savefig(os.path.join(plot_directory, sample_name))
+    evolution_figure.figure.savefig(os.path.join(plot_directory, evolution_name))
+    plt.clf()
+    plt.close()
+
+
+def main():
     for objective_function in objective_functions:
-        print('Evaluating on {}'.format(objective_function.__name__))
+        operation = 'Plotting'
+        if should_evaluate:
+            operation = 'Evaluating on'
+
+        print('{} {}'.format(operation, objective_function.__name__))
 
         paths = {
             m:  {
@@ -58,35 +135,13 @@ if __name__ == '__main__':
             } for m in methods
         }
 
-        for sample_id in tqdm.tqdm(range(sample_size), total=sample_size):
-            results = {
-                'pso': run_method(PSO, objective_function, {
-                    'n_particles': 30,
-                    'social': 2.05,
-                    'cognitive': 2.05,
-                    'communication': Communication.socially_connected(),
-                    'inertia': Inertia.linear(min_weight=0.4,max_weight=0.9)
-                }),
+        if should_evaluate:
+            evaluate(objective_function, paths)
+            continue
 
-                'fss': run_method(FSS, objective_function, {
-                    'n_fishes': 30,
-                    'step': Step.linear(individual=(0.1, 0.001),
-                                        volitive=(0.01, 0.001))
-                }),
+        plot(objective_function.__name__, paths)
 
-                'abc': run_method(ABC, objective_function, {
-                    'colony_size': 30,
-                    'trials': 100
-                })
-            }
 
-            for m in methods:
-                with open(paths[m]['sp'], 'a+') as f:
-                    f.write(str(results[m][1]))
-                    f.write('\n')
+if __name__ == '__main__':
+    main()
 
-                with open(paths[m]['ev'], 'a+') as f:
-                    tracker = results[m][2]
-                    evolution = tracker.fn_evaluations.tolist()
-                    f.write(','.join(map(lambda t: '{:.2f}'.format(t), evolution)))
-                    f.write('\n')
