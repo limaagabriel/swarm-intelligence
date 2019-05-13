@@ -1,3 +1,4 @@
 *.pyc
 .idea
+results
 .DS_Store
