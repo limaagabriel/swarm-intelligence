@@ -1,8 +1,8 @@
 from optimization.abc import ABC
 from benchmark.stop import StopCriterion
-from benchmark.functions import SphereFunction
-from benchmark.functions import RastriginFunction
-from benchmark.functions import RosenbrockFunction
+from benchmark.functions.continuous import SphereFunction
+from benchmark.functions.continuous import RastriginFunction
+from benchmark.functions.continuous import RosenbrockFunction
 
 dimensions = 30
 colony_size = 30

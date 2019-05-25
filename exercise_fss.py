@@ -1,7 +1,7 @@
 from optimization.fss import FSS
 from optimization.fss.strategies import Step
 from benchmark.stop import StopCriterion
-from benchmark.functions import SphereFunction
+from benchmark.functions.continuous import SphereFunction
 
 dimensions = 30
 num_fishes = 30

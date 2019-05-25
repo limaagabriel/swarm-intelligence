@@ -9,8 +9,10 @@ from optimization.pso import PSO
 from optimization.fss import FSS
 from optimization.abc import ABC
 
-from benchmark import functions
 from benchmark.stop import StopCriterion
+from benchmark.functions.continuous import SphereFunction
+from benchmark.functions.continuous import RastriginFunction
+from benchmark.functions.continuous import RosenbrockFunction
 
 from optimization.fss.strategies import Step
 from optimization.pso.strategies import Inertia
@@ -23,9 +25,9 @@ should_evaluate = True
 matplotlib.use('Agg')
 
 objective_functions = [
-    functions.SphereFunction,
-    functions.RastriginFunction,
-    functions.RosenbrockFunction
+    SphereFunction,
+    RastriginFunction,
+    RosenbrockFunction
 ]
 
 methods = ['pso', 'fss', 'abc']

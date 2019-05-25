@@ -1,7 +1,11 @@
 from optimization.pso import PSO
 from itertools import product
-from benchmark import functions
+
 from benchmark.stop import StopCriterion
+from benchmark.functions.continuous import SphereFunction
+from benchmark.functions.continuous import RastriginFunction
+from benchmark.functions.continuous import RosenbrockFunction
+
 from optimization.pso.strategies import Inertia
 from optimization.pso.strategies import Communication
 
@@ -20,9 +24,9 @@ social_coefficient = 2.05
 cognitive_coefficient = 2.05
 
 objective_functions = [
-    functions.SphereFunction(dimensions),
-    functions.RastriginFunction(dimensions),
-    functions.RosenbrockFunction(dimensions)
+    SphereFunction(dimensions),
+    RastriginFunction(dimensions),
+    RosenbrockFunction(dimensions)
 ]
 
 inertia_strategies = [
