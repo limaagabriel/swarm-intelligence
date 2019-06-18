@@ -5,6 +5,7 @@ from benchmark.stop import StopCriterion
 from benchmark.functions.continuous import SphereFunction
 from benchmark.functions.continuous import RastriginFunction
 from benchmark.functions.continuous import RosenbrockFunction
+from benchmark.initializer.continuous import ContinuousInitializer
 
 from optimization.pso.strategies import Inertia
 from optimization.pso.strategies import Communication
@@ -60,7 +61,9 @@ for fn, inertia_strategy in cases:
                       inertia=inertia_strategy,
                       communication=communication_strategy)
 
-            best, best_fitness, tracker = pso.optimize(fn, stop_criterion=StopCriterion.iteration_limit(iterations))
+            stop_criterion = StopCriterion.iteration_limit(iterations)
+            initializer = ContinuousInitializer.uniform_random(fn.bounds, dimensions)
+            best, best_fitness, tracker = pso.optimize(fn, initializer, stop_criterion)
 
             result_summary = (
                 i + 1,

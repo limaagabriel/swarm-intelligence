@@ -4,10 +4,12 @@ from abc import abstractmethod
 
 
 class ObjectiveFunction(ABC):
-    def __init__(self, name, dimensions, bounds):
+    bounds = (-1, 1)
+
+    def __init__(self, name, dimensions):
         self.name = name
-        self.min = bounds[0]
-        self.max = bounds[1]
+        self.min = self.bounds[0]
+        self.max = self.bounds[1]
         self.dimensions = dimensions
 
         self.__listeners = []
@@ -19,11 +21,6 @@ class ObjectiveFunction(ABC):
     @property
     def evaluations(self):
         return self.__evaluations
-
-    def search_space_initializer(self):
-        a = self.max / 2.0
-        b = self.max
-        return np.random.uniform(a, b, self.dimensions)
 
     def __call__(self, x):
         self.__evaluations += 1
@@ -43,16 +40,20 @@ class ObjectiveFunction(ABC):
 
 
 class SphereFunction(ObjectiveFunction):
+    bounds = (-100.0, 100.0)
+
     def __init__(self, dim):
-        super(SphereFunction, self).__init__('Sphere', dim, (-100.0, 100.0))
+        super(SphereFunction, self).__init__('Sphere', dim)
 
     def run(self, x):
         return (x ** 2).sum()
 
 
 class RosenbrockFunction(ObjectiveFunction):
+    bounds = (-30.0, 30.0)
+
     def __init__(self, dim):
-        super(RosenbrockFunction, self).__init__('Rosenbrock', dim, (-30.0, 30.0))
+        super(RosenbrockFunction, self).__init__('Rosenbrock', dim)
 
     def run(self, x):
         a = x[1:] - (x[:-1] ** 2)
@@ -63,8 +64,10 @@ class RosenbrockFunction(ObjectiveFunction):
 
 
 class RastriginFunction(ObjectiveFunction):
+    bounds = (-5.12, 5.12)
+
     def __init__(self, dim):
-        super(RastriginFunction, self).__init__('Rastrigin', dim, (-5.12, 5.12))
+        super(RastriginFunction, self).__init__('Rastrigin', dim)
 
     def run(self, x):
         y = (x ** 2) - 10 * np.cos(2.0 * np.pi * x) + 10

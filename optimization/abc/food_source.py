@@ -3,9 +3,10 @@ from optimization import Agent
 
 
 class FoodSource(Agent):
-    def __init__(self, fn):
-        super().__init__(fn)
+    def __init__(self, fn, initializer):
+        super().__init__(fn, initializer)
 
+        self.__initializer = initializer
         self.__probability = 0.0
         self.__trials = 0
 
@@ -20,9 +21,6 @@ class FoodSource(Agent):
     @property
     def trials(self):
         return self.__trials
-
-    def replace(self):
-        self.__init__(self.fn)
 
     def greedy_search(self, reference):
         v = self.position.copy()

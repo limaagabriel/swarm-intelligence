@@ -13,6 +13,7 @@ from benchmark.stop import StopCriterion
 from benchmark.functions.continuous import SphereFunction
 from benchmark.functions.continuous import RastriginFunction
 from benchmark.functions.continuous import RosenbrockFunction
+from benchmark.initializer.continuous import ContinuousInitializer
 
 from optimization.fss.strategies import Step
 from optimization.pso.strategies import Inertia
@@ -21,7 +22,7 @@ from optimization.pso.strategies import Communication
 dimensions = 30
 sample_size = 30
 fn_evaluations = 500000
-should_evaluate = True
+should_evaluate = False
 matplotlib.use('Agg')
 
 objective_functions = [
@@ -52,7 +53,8 @@ def evaluate(objective_function, paths):
         fn_instance = fn(dimensions)
         method_instance = method(**parameters)
         stop_criterion = StopCriterion.fn_evaluation(fn_evaluations)
-        return method_instance.optimize(fn_instance, stop_criterion=stop_criterion)
+        initializer = ContinuousInitializer.uniform_random(fn.bounds, fn.dimensions)
+        return method_instance.optimize(fn_instance, initializer, stop_criterion)
 
     for _ in tqdm.tqdm(range(sample_size), total=sample_size):
         results = {

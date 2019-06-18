@@ -26,12 +26,17 @@ class FitnessTracker(object):
 
 
 class Agent(ABC):
-    def __init__(self, fn):
+    def __init__(self, fn, initializer):
         self.__id = str(uuid.uuid4())
+        self.__initializer = initializer
 
         self.fn = fn
-        self.position = fn.search_space_initializer()
+        self.position = initializer()
         self.fitness = fn(self.position)
+
+    def replace(self):
+        self.position = self.__initializer()
+        self.fitness = self.fn(self.position)
 
     @property
     def id(self):
@@ -59,14 +64,16 @@ class SwarmOptimizationMethod(ABC):
         self.__size = swarm_size
         self.swarm = []
 
+        self.initializer = None
         self.best_position = None
         self.best_fitness = sys.maxsize
 
-    def create_swarm(self, fn):
-        self.swarm = [self.__agent_class(fn) for _ in range(self.__size)]
+    def create_swarm(self, fn, initializer):
+        self.swarm = [self.__agent_class(fn, initializer) for _ in range(self.__size)]
 
-    def optimize(self, fn, stop_criterion):
-        self.create_swarm(fn)
+    def optimize(self, fn, initializer, stop_criterion):
+        self.initializer = initializer
+        self.create_swarm(fn, initializer)
         self.update_best_solution()
         tracker = FitnessTracker()
 

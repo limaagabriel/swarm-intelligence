@@ -3,8 +3,8 @@ from optimization import Agent
 
 
 class Fish(Agent):
-    def __init__(self, fn, min_weight=1):
-        super().__init__(fn)
+    def __init__(self, fn, initializer, min_weight=1):
+        super().__init__(fn, initializer)
 
         self.__improvement = 0
         self.__min_weight = min_weight

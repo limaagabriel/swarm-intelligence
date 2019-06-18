@@ -3,8 +3,8 @@ from optimization import Agent
 
 
 class Particle(Agent):
-    def __init__(self, fn, max_speed=1.0):
-        super().__init__(fn)
+    def __init__(self, fn, initializer, max_speed=1.0):
+        super().__init__(fn, initializer)
         self.__max_speed = max_speed * (fn.max - fn.min)
 
         self.__speed = np.zeros(fn.dimensions)

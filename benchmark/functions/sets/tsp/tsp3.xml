@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<travellingSalesmanProblemInstance>
+    <name>tsp3</name>
+    <source>TSPLIB</source>
+    <description>3 city problem</description>
+    <doublePrecision>15</doublePrecision>
+    <ignoredDigits>5</ignoredDigits>
+    <graph>
+        <vertex>
+            <edge cost="9.999000000000000e+03">0</edge>
+            <edge cost="3.000000000000000e+00">1</edge>
+            <edge cost="3.000000000000000e+00">2</edge>
+        </vertex>
+        <vertex>
+            <edge cost="3.000000000000000e+00">0</edge>
+            <edge cost="9.999000000000000e+03">1</edge>
+            <edge cost="5.000000000000000e+00">2</edge>
+        </vertex>
+        <vertex>
+            <edge cost="3.000000000000000e+00">0</edge>
+            <edge cost="5.000000000000000e+00">1</edge>
+            <edge cost="9.999000000000000e+03">2</edge>
+        </vertex>
+    </graph>
+</travellingSalesmanProblemInstance>

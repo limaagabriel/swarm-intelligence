@@ -16,6 +16,10 @@ class ObjectiveFunction(ABC):
         self.__listeners = []
         self.__evaluations = 0
 
+    @property
+    def states(self):
+        return np.arange(self.num_states)
+
     @staticmethod
     def __read(path):
         tree = etree.parse(path)
@@ -37,10 +41,6 @@ class ObjectiveFunction(ABC):
     @property
     def evaluations(self):
         return self.__evaluations
-
-    def search_space_initializer(self):
-        v = np.random.uniform(0, self.num_states - 1)
-        return int(round(v))
 
     def __call__(self, x):
         return sys.maxsize
