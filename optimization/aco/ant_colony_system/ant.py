@@ -8,7 +8,7 @@ class Ant(BaseAnt):
         super().__init__(fn, initializer)
 
     def state_transition_rule(self, neighborhood, q0, alpha, beta, trails):
-        if np.random.uniform(0, 1) < q0:
+        if np.random.uniform(0, 1) <= q0:
             return self.__exploit(neighborhood, alpha, beta, trails)
         return self.__explore(neighborhood, alpha, beta, trails)
 

@@ -2,9 +2,17 @@ import numpy as np
 from optimization.aco.algorithm import ACO
 from optimization.aco.ant_colony_system.ant import Ant
 
+# Implemented following the instructions provided in:
+# Ant Colony System: A Cooperative Learning Approach to the Traveling Salesman Problem
+# Authors: Marco Dorigo and Luca Maria Gambardella
+
+# Default parameters were chosen based on:
+# On Optimal Parameters for Ant Colony Optimization algorithms
+# Authors: Dorian Gaertner and Keith Clark
+
 
 class AntColonySystem(ACO):
-    def __init__(self, n_ants, alpha, beta, rho, q0):
+    def __init__(self, n_ants, alpha=1, beta=6, rho=0.6, q0=0.8):
         self.__alpha = alpha
         self.__beta = beta
         self.__rho = rho
