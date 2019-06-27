@@ -4,13 +4,15 @@ from optimization.aco.ant_system.ant import Ant
 
 
 class AntSystem(ACO):
-    def __init__(self, n_ants, alpha, beta, rho, q):
+    agent = Ant
+
+    def __init__(self, n_ants, alpha, beta, rho, q, **kwargs):
         self.__alpha = alpha
         self.__beta = beta
         self.__rho = rho
         self.__q = q
 
-        super().__init__(Ant, n_ants)
+        super().__init__(n_ants, **kwargs)
 
     def make_tours(self):
         for ant in self.swarm:

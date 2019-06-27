@@ -12,13 +12,15 @@ from optimization.aco.ant_colony_system.ant import Ant
 
 
 class AntColonySystem(ACO):
-    def __init__(self, n_ants, alpha=1, beta=6, rho=0.6, q0=0.8):
+    agent = Ant
+
+    def __init__(self, n_ants, alpha=1, beta=6, rho=0.6, q0=0.8, **kwargs):
         self.__alpha = alpha
         self.__beta = beta
         self.__rho = rho
         self.__q0 = q0
 
-        super().__init__(Ant, n_ants)
+        super().__init__(n_ants, **kwargs)
 
     def make_tours(self):
         for ant in self.swarm:

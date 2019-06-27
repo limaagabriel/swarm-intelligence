@@ -1,13 +1,16 @@
 import numpy as np
 from util import foreach
 from abc import abstractmethod
+from optimization.aco.ant import BaseAnt
 from optimization import SwarmOptimizationMethod
 
 
 class ACO(SwarmOptimizationMethod):
-    def __init__(self, agent_class, swarm_size):
+    agent = BaseAnt
+
+    def __init__(self, swarm_size, **kwargs):
         self.trails = None
-        super().__init__(agent_class, swarm_size)
+        super().__init__(self.agent, swarm_size, **kwargs)
 
     def __call__(self, fn, stop_criterion, tracker):
         it = 0

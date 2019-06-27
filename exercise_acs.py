@@ -6,7 +6,7 @@ from benchmark.functions.combinatorial import TSP
 from benchmark.initializer.combinatorial import CombinatorialInitializer
 
 tsp = TSP('gr17')
-acs = AntColonySystem(tsp.num_states)
+acs = AntColonySystem(10)
 stop_criterion = StopCriterion.iteration_limit(2500)
 initializer = CombinatorialInitializer.uniform_random(tsp.states)
 

@@ -59,8 +59,9 @@ class Agent(ABC):
 
 
 class SwarmOptimizationMethod(ABC):
-    def __init__(self, agent_class, swarm_size):
+    def __init__(self, agent_class, swarm_size, **kwargs):
         self.__agent_class = agent_class
+        self.__agent_params = kwargs
         self.__size = swarm_size
         self.swarm = []
 
@@ -69,7 +70,10 @@ class SwarmOptimizationMethod(ABC):
         self.best_fitness = sys.maxsize
 
     def create_swarm(self, fn, initializer):
-        self.swarm = [self.__agent_class(fn, initializer) for _ in range(self.__size)]
+        self.swarm = [
+            self.__agent_class(fn, initializer, **self.__agent_params)
+            for _ in range(self.__size)
+        ]
 
     def optimize(self, fn, initializer, stop_criterion):
         self.initializer = initializer
